@@ -1,0 +1,22 @@
+# FastAPI Web Application Requirements
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+jinja2>=3.1.2
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+aiofiles>=23.2.1
+
+# Image processing
+pillow>=10.0.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+
+# AI/ML (already in main requirements)
+# ultralytics>=8.0.0
+# torch>=2.0.0
+# torchvision>=0.15.0
+
+# Additional utilities
+python-dotenv>=1.0.0
+requests>=2.31.0
