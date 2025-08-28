@@ -2,6 +2,10 @@
 
 This project implements a plant leaf disease detection system using YOLOv8 (You Only Look Once) deep learning model. The system can identify 30 different types of plant diseases and healthy leaves across 13 plant species.
 
+AI-centric application in Python, I was on the lookout for a backend framework, I came across FastAPI. It caught my attention for being one of the most loved frameworks in the Stack Overflow Developer Survey 2022. After trying it out, I was instantly drawn to FastAPI's simplicity and modern features like Asynchronous Server Gateway Interface (ASGI) support and built-in OpenAPI spec (Swagger).
+
+Setting up a basic FastAPI project was a breeze, and I was able to ramp up quickly
+
 GowthamSetup.bat
 
 ## 📋 Dataset Information
@@ -318,5 +322,6 @@ Feel free to submit issues, feature requests, or pull requests to improve this p
 ---
 
 **Happy Training! 🌱🔍**
+
 
 
