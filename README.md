@@ -1,9 +1,8 @@
 # Plant Leaf Disease Detection with YOLO
-GowthamSetup.bat
-
-# Plant Leaf Disease Detection with YOLO
 
 This project implements a plant leaf disease detection system using YOLOv8 (You Only Look Once) deep learning model. The system can identify 30 different types of plant diseases and healthy leaves across 13 plant species.
+
+GowthamSetup.bat
 
 ## 📋 Dataset Information
 
@@ -319,4 +318,5 @@ Feel free to submit issues, feature requests, or pull requests to improve this p
 ---
 
 **Happy Training! 🌱🔍**
+
 
