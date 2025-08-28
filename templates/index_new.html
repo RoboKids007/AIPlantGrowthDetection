@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 Plant Disease Detective - AI Powered Plant Doctor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --success-color: #45b7d1;
+            --warning-color: #ffa726;
+            --danger-color: #ef5350;
+            --purple-color: #ab47bc;
+            --green-color: #66bb6a;
+            --orange-color: #ff8a65;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .background-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23ffffff" opacity="0.1"/><circle cx="80" cy="20" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="50" cy="50" r="1.5" fill="%23ffffff" opacity="0.1"/><circle cx="90" cy="80" r="2" fill="%23ffffff" opacity="0.1"/><circle cx="10" cy="90" r="1" fill="%23ffffff" opacity="0.1"/></svg>');
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid var(--primary-color);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.8rem;
+            color: var(--primary-color) !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: #333 !important;
+            margin: 0 0.5rem;
+            border-radius: 20px;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--secondary-color);
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 250px;
+            background: linear-gradient(180deg, var(--primary-color), var(--purple-color));
+            transform: translateX(-250px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            padding-top: 80px;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.2);
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-item {
+            padding: 1rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-left-color: white;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.1);
+            background: var(--secondary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 0;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 3rem;
+            margin: 2rem 0;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,107,107,0.05), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .hero-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 3rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Cards */
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .feature-card.upload-card {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #fff, #fff8f8);
+        }
+
+        .feature-card.gallery-card {
+            border-color: var(--secondary-color);
+            background: linear-gradient(135deg, #fff, #f8fffe);
+        }
+
+        .feature-card.results-card {
+            border-color: var(--success-color);
+            background: linear-gradient(135deg, #fff, #f8fbff);
+        }
+
+        /* Tabs */
+        .custom-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.9);
+            border-radius: 25px;
+            padding: 0.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            background: transparent;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .tab-button.active {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255,107,107,0.3);
+        }
+
+        .tab-button:hover:not(.active) {
+            background: rgba(255,107,107,0.1);
+            color: var(--primary-color);
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 3px dashed var(--primary-color);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255,107,107,0.05), rgba(78,205,196,0.05));
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--secondary-color);
+            background: linear-gradient(135deg, rgba(78,205,196,0.1), rgba(255,107,107,0.1));
+            transform: scale(1.02);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--success-color);
+            background: linear-gradient(135deg, rgba(69,183,209,0.1), rgba(102,187,106,0.1));
+            transform: scale(1.05);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Gallery */
+        .test-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .gallery-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 1rem 0.5rem 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Results */
+        .results-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .disease-card {
+            background: linear-gradient(135deg, #fff, #fafafa);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 5px solid var(--warning-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .disease-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .healthy-card {
+            border-left-color: var(--green-color);
+            background: linear-gradient(135deg, #fff, #f8fff8);
+        }
+
+        /* Buttons */
+        .btn-custom {
+            border-radius: 25px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-custom:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(45deg, var(--primary-color), var(--orange-color));
+            color: white;
+        }
+
+        .btn-success-custom {
+            background: linear-gradient(45deg, var(--green-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-info-custom {
+            background: linear-gradient(45deg, var(--success-color), var(--purple-color));
+            color: white;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner-custom {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .upload-zone {
+                padding: 2rem 1rem;
+            }
+            
+            .test-gallery {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        /* Fun animations */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .wobble {
+            animation: wobble 2s infinite;
+        }
+
+        @keyframes wobble {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(1deg); }
+            75% { transform: rotate(-1deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <!-- Sidebar Toggle -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <a href="#home" class="sidebar-item" onclick="showSection('home')">
+            <i class="fas fa-home"></i> Home
+        </a>
+        <a href="#upload" class="sidebar-item" onclick="showSection('upload')">
+            <i class="fas fa-cloud-upload-alt"></i> Upload Image
+        </a>
+        <a href="#gallery" class="sidebar-item" onclick="showSection('gallery')">
+            <i class="fas fa-images"></i> Test Gallery
+        </a>
+        <a href="#about" class="sidebar-item" onclick="showSection('about')">
+            <i class="fas fa-info-circle"></i> About AI
+        </a>
+        <a href="#help" class="sidebar-item" onclick="showSection('help')">
+            <i class="fas fa-question-circle"></i> Help
+        </a>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-seedling wobble"></i> Plant Disease Detective
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#upload">
+                            <i class="fas fa-camera"></i> Diagnose
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#gallery">
+                            <i class="fas fa-image"></i> Examples
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">
+                            <i class="fas fa-brain"></i> AI Info
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hero Section -->
+        <div class="hero-section" id="home">
+            <h1 class="hero-title pulse">🌱 Plant Disease Detective</h1>
+            <p class="hero-subtitle">
+                AI-Powered Plant Health Analysis • Instant Disease Detection • Smart Treatment Recommendations
+            </p>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-camera text-primary" style="color: var(--primary-color) !important;"></i>
+                        </div>
+                        <h5>📸 Quick Upload</h5>
+                        <p>Simply take a photo or upload an image of your plant</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain text-success" style="color: var(--secondary-color) !important;"></i>
+                        </div>
+                        <h5>🧠 AI Analysis</h5>
+                        <p>Advanced AI analyzes 30+ plant diseases instantly</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-prescription-bottle-alt text-warning" style="color: var(--warning-color) !important;"></i>
+                        </div>
+                        <h5>💊 Treatment Plan</h5>
+                        <p>Get personalized treatment recommendations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="custom-tabs">
+            <button class="tab-button active" onclick="showTab('upload', this)">
+                <i class="fas fa-cloud-upload-alt"></i> Upload & Analyze
+            </button>
+            <button class="tab-button" onclick="showTab('gallery', this)">
+                <i class="fas fa-images"></i> Test Gallery
+            </button>
+            <button class="tab-button" onclick="showTab('results', this)">
+                <i class="fas fa-chart-line"></i> Results
+            </button>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="feature-card upload-card" id="upload-tab">
+            <h3><i class="fas fa-cloud-upload-alt"></i> Upload Your Plant Image</h3>
+            <p>Drag & drop an image or click to browse. Our AI will automatically resize and analyze it!</p>
+            
+            <div class="upload-section">
+                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h5>Drop your plant image here</h5>
+                    <p>or click to browse files</p>
+                    <small class="text-muted">Supports JPG, PNG • Auto-resized for optimal AI analysis</small>
+                </div>
+                
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                
+                <div class="mt-3">
+                    <button class="btn btn-custom btn-primary-custom" onclick="analyzeImage()">
+                        <i class="fas fa-microscope"></i> Analyze Plant Health
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Gallery Section -->
+        <div class="feature-card gallery-card" id="gallery-tab" style="display: none;">
+            <h3><i class="fas fa-images"></i> Quick Test Gallery</h3>
+            <p>Click on any sample image below for instant AI analysis!</p>
+            
+            <div class="test-gallery" id="testGallery">
+                <div class="gallery-loading">
+                    <div class="spinner-custom"></div>
+                    <p><i class="fas fa-leaf"></i> Loading test images...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-tab" style="display: none;">
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+                <div class="spinner-custom"></div>
+                <h4>🔬 AI Brain is Analyzing...</h4>
+                <p>Examining plant health patterns</p>
+            </div>
+
+            <!-- Results -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <h3><i class="fas fa-chart-line"></i> Analysis Results</h3>
+                <div id="resultsContent"></div>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <div class="feature-card results-card" id="about" style="display: none;">
+            <h3><i class="fas fa-brain"></i> About Our AI Technology</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>🎯 YOLOv8 Detection</h5>
+                    <p>Ultra-fast object detection trained on thousands of plant disease images</p>
+                    
+                    <h5>📊 30+ Disease Classes</h5>
+                    <p>Covers major plant diseases across 13+ plant species including tomato, apple, corn, and more</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>🎨 Smart Resizing</h5>
+                    <p>Automatically optimizes your images for best AI performance while maintaining quality</p>
+                    
+                    <h5>⚡ Real-time Analysis</h5>
+                    <p>Get instant results with confidence scores and treatment recommendations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="feature-card upload-card" id="help" style="display: none;">
+            <h3><i class="fas fa-question-circle"></i> How to Use</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>📱 Taking Photos</h5>
+                    <ul>
+                        <li>Use good lighting</li>
+                        <li>Focus on affected leaves</li>
+                        <li>Avoid blurry images</li>
+                        <li>Include the whole leaf when possible</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5>🔍 Understanding Results</h5>
+                    <ul>
+                        <li>Higher confidence = more accurate</li>
+                        <li>Multiple detections show disease spread</li>
+                        <li>Follow treatment recommendations</li>
+                        <li>Consult experts for severe cases</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & Custom JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentImage = null;
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultsSection = document.getElementById('resultsSection');
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Tab switching with proper element reference
+        function showTab(tabName, clickedElement) {
+            // Hide all tabs
+            document.getElementById('upload-tab').style.display = 'none';
+            document.getElementById('gallery-tab').style.display = 'none';
+            document.getElementById('results-tab').style.display = 'none';
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').style.display = 'block';
+            
+            // Add active class to clicked button
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+        }
+
+        // Section switching for sidebar
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = ['home', 'upload-tab', 'gallery-tab', 'about', 'help'];
+            sections.forEach(section => {
+                const element = document.getElementById(section);
+                if (element) element.style.display = 'none';
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+            
+            // Close sidebar on mobile
+            document.getElementById('sidebar').classList.remove('active');
+        }
+
+        // File input handling
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                currentImage = e.target.files[0];
+                displaySelectedImage();
+            }
+        });
+
+        // Drag and drop functionality
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                currentImage = files[0];
+                displaySelectedImage();
+            }
+        });
+
+        function displaySelectedImage() {
+            if (!currentImage) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadZone.innerHTML = `
+                    <div class="selected-image-preview">
+                        <img src="${e.target.result}" alt="Selected image" style="max-width: 300px; max-height: 200px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <h5 class="mt-2">📸 Image Selected!</h5>
+                        <p>${currentImage.name}</p>
+                        <small class="text-success">✅ Ready for AI analysis</small>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(currentImage);
+        }
+
+        async function analyzeImage() {
+            if (!currentImage) {
+                alert('🚫 Please select an image first!');
+                return;
+            }
+
+            try {
+                // Switch to results tab and show loading
+                showTab('results', document.querySelector('.tab-button:nth-child(3)'));
+                loadingSpinner.style.display = 'block';
+                resultsSection.style.display = 'none';
+
+                // Create FormData
+                const formData = new FormData();
+                formData.append('file', currentImage);
+
+                // Send to API
+                const response = await fetch('/predict/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    throw new Error(data.detail || 'Unknown error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error analyzing image: ' + error.message);
+                loadingSpinner.style.display = 'none';
+            }
+        }
+
+        function displayResults(data) {
+            loadingSpinner.style.display = 'none';
+            resultsSection.style.display = 'block';
+            
+            let resultsHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="image-container">
+                            <img src="data:image/jpeg;base64,${data.original_image}" alt="Original" class="img-fluid">
+                            <div class="image-label">📸 Original Image</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="image-container">
+                            <img src="data:image/jpeg;base64,${data.annotated_image}" alt="Analysis" class="img-fluid">
+                            <div class="image-label">🔍 AI Analysis</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (data.detections && data.detections.length > 0) {
+                resultsHTML += '<h4 class="mt-4">🦠 Detected Issues</h4>';
+                data.detections.forEach((detection, index) => {
+                    const cardClass = detection.is_diseased ? 'disease-card' : 'healthy-card';
+                    const iconClass = detection.is_diseased ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle';
+                    const iconColor = detection.is_diseased ? 'var(--warning-color)' : 'var(--green-color)';
+                    
+                    resultsHTML += `
+                        <div class="${cardClass}">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="${iconClass}" style="color: ${iconColor}; font-size: 1.5rem; margin-right: 1rem;"></i>
+                                <div>
+                                    <h5 class="mb-1">${detection.class_name}</h5>
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill" style="width: ${detection.confidence * 100}%"></div>
+                                    </div>
+                                    <small>Confidence: ${(detection.confidence * 100).toFixed(1)}%</small>
+                                </div>
+                            </div>
+                            
+                            ${detection.disease_info ? `
+                                <div class="disease-details mt-3">
+                                    <h6>📋 Disease Information</h6>
+                                    <p><strong>Description:</strong> ${detection.disease_info.description}</p>
+                                    <p><strong>💊 Treatment:</strong> ${detection.disease_info.treatment}</p>
+                                    <p><strong>🛡️ Prevention:</strong> ${detection.disease_info.prevention}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+            } else {
+                resultsHTML += `
+                    <div class="healthy-card">
+                        <div class="text-center">
+                            <i class="fas fa-heart" style="color: var(--green-color); font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <h4>🌿 Healthy Plant Detected!</h4>
+                            <p>No diseases found in your plant. Keep up the good care!</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultsHTML += `
+                <div class="text-center mt-4">
+                    <button class="btn btn-custom btn-info-custom" onclick="resetApp()">
+                        <i class="fas fa-redo"></i> Analyze Another Image
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('resultsContent').innerHTML = resultsHTML;
+        }
+
+        function resetApp() {
+            currentImage = null;
+            loadingSpinner.style.display = 'none';
+            resultsSection.style.display = 'none';
+            
+            // Reset upload zone
+            uploadZone.innerHTML = `
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h5>Drop your plant image here</h5>
+                <p>or click to browse files</p>
+                <small class="text-muted">Supports JPG, PNG • Auto-resized for optimal AI analysis</small>
+            `;
+            
+            // Show upload tab
+            showTab('upload', document.querySelector('.tab-button:first-child'));
+        }
+
+        // Load test images
+        async function loadTestImages() {
+            try {
+                const response = await fetch('/test-images/');
+                const images = await response.json();
+                displayTestGallery(images);
+            } catch (error) {
+                console.log('Test images not available');
+                document.getElementById('testGallery').innerHTML = `
+                    <div class="gallery-loading">
+                        <i class="fas fa-info-circle"></i> No test images available
+                        <br><small>Upload your own images to test the AI</small>
+                    </div>
+                `;
+            }
+        }
+
+        function displayTestGallery(images) {
+            const gallery = document.getElementById('testGallery');
+            
+            if (images.length === 0) {
+                gallery.innerHTML = `
+                    <div class="gallery-loading">
+                        <i class="fas fa-folder-open"></i> No test images found
+                    </div>
+                `;
+                return;
+            }
+
+            gallery.innerHTML = images.map(img => `
+                <div class="gallery-item" onclick="selectTestImage('${img.url}', '${img.name}')">
+                    <img src="${img.url}" alt="${img.name}" loading="lazy">
+                    <div class="gallery-item-overlay">
+                        ${img.name.replace(/\.[^/.]+$/, "").substring(0, 20)}...
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function selectTestImage(imageUrl, imageName) {
+            try {
+                // Show loading
+                showTab('results', document.querySelector('.tab-button:nth-child(3)'));
+                loadingSpinner.style.display = 'block';
+                resultsSection.style.display = 'none';
+
+                // Fetch the image as blob
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+                
+                // Create FormData
+                const formData = new FormData();
+                formData.append('file', blob, imageName);
+
+                // Send to API
+                const predictResponse = await fetch('/predict/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await predictResponse.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    throw new Error(data.detail || 'Unknown error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error processing image: ' + error.message);
+                loadingSpinner.style.display = 'none';
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTestImages();
+        });
+    </script>
+</body>
+</html>
